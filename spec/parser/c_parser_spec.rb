@@ -159,6 +159,7 @@ RSpec.describe YARD::Parser::C::CParser do
         constant = Registry.at('Example::HELLO')
         expect(constant.value).to eq '3'
         expect(constant.docstring).to eq "Hello description."
+        expect(constant.group).to eq nil
       end
     end
 
