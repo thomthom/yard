@@ -162,6 +162,44 @@ RSpec.describe YARD::Parser::C::CParser do
       end
     end
 
+    describe "Ruby Group directives" do
+      it "groups constants" do
+        ruby_source = <<-eof
+          class Example
+
+              # @!group Foos
+
+              # Foobar description.
+              FOOBAR = 1
+
+              # Foobiz description.
+              FOOBIZ = 2
+
+              # @!endgroup
+
+              # Hello description.
+              HELLO = 3
+          end
+        eof
+        Registry.clear
+        YARD.parse_string(ruby_source, :ruby)
+
+        constant = Registry.at('Example::FOOBAR')
+        expect(constant.value).to eq '1'
+        expect(constant.docstring).to eq "Foobar description."
+        expect(constant.group).to eq "Foos"
+
+        constant = Registry.at('Example::FOOBIZ')
+        expect(constant.value).to eq '2'
+        expect(constant.docstring).to eq "Foobiz description."
+        expect(constant.group).to eq "Foos"
+
+        constant = Registry.at('Example::HELLO')
+        expect(constant.value).to eq '3'
+        expect(constant.docstring).to eq "Hello description."
+      end
+    end
+
     describe "Macros" do
       it "handles param## inside of macros" do
         thr = Thread.new do
